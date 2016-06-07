@@ -1,0 +1,10 @@
+resolver: lts-6.1
+
+packages:
+- .
+- ../workflow-types
+- ../workflow-osx
+- ../NSSpeechRecognizer
+
+extra-deps:
+- c-storable-deriving-0.1.3
