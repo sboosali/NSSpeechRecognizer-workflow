@@ -66,6 +66,7 @@ library
              , NSSpeechRecognizer
 
              , exceptions
+             , transformers
 
 executable example-NSSpeechRecognizer-workflow
  hs-source-dirs:      executables
