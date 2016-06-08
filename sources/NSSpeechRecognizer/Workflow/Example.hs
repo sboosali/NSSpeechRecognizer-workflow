@@ -5,7 +5,7 @@ module NSSpeechRecognizer.Workflow.Example where
 -- import NSSpeechRecognizer.Workflow
 import NSSpeechRecognizer
 import Workflow.OSX (runWorkflowT)
-import Workflow.Core (press,insert,delay,getClipboard,openApplication,openURL,click,MouseButton(LeftButton))
+import Workflow.Core (press,insert,delay,getClipboard,setClipboard,openApplication,openURL,click,MouseButton(LeftButton))
 
 import qualified Control.Monad.Catch ()
   -- instances only (in particular, @instance MonadThrow IO@)
@@ -23,6 +23,7 @@ stack build && stack exec -- example-NSSpeechRecognizer-workflow
 -}
 main :: IO ()
 main = do
+  putStrLn "NSSpeechRecognizer.Workflow.Example..."
   let Recognizer{..} = (aVoiceMapRecognizer commands)
   let recognizer = Recognizer{rHandler, rState = rState{rExclusivity = Exclusive}}
   print "(Listening...)"
@@ -39,7 +40,7 @@ copy = do
 
 cut = do
   press "H-x"
-  delay 1000
+  pause
   getClipboard
 
 doubleClick = do
@@ -47,6 +48,11 @@ doubleClick = do
 
 -- | for one "frame"
 pause = delay 30
+
+insertByClipboard s = do
+  setClipboard s
+  pause
+  press "H-v"
 
 camelCase = words >>> go >>> intercalate ""
  where
@@ -120,10 +126,9 @@ commands = fmap (fmap runWorkflowT)
 
   , "camel that"-: do                                  -- camel case the currently selected text
     x <- cut
-    -- liftIO $ print x
     let y = camelCase x
+    liftIO $ print y
     insert y
-    delay 1000
 
   , "google that"-: do                                 -- Google the currently selected text
     s <- copy
