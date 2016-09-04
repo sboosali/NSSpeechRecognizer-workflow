@@ -61,12 +61,16 @@ library
 
  build-depends:
                base >=4.7 && <5
+             , transformers
+             , stm
+
              , workflow-types
              , workflow-osx
+             , workflow-extra
              , NSSpeechRecognizer
 
              , exceptions
-             , transformers
+             , pipes
 
 executable example-NSSpeechRecognizer-workflow
  hs-source-dirs:      executables

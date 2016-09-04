@@ -4,7 +4,11 @@ packages:
 - .
 - ../workflow-types
 - ../workflow-osx
+- ../workflow-extra
+
 - ../NSSpeechRecognizer
 
 extra-deps:
 - c-storable-deriving-0.1.3
+- workflow-osx-0.0.1
+- workflow-extra-0.0.0

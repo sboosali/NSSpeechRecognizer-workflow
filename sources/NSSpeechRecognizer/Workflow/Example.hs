@@ -4,8 +4,9 @@
 module NSSpeechRecognizer.Workflow.Example where
 -- import NSSpeechRecognizer.Workflow
 import NSSpeechRecognizer
-import Workflow.OSX (runWorkflowT)
-import Workflow.Core (press,insert,delay,getClipboard,setClipboard,openApplication,openURL,click,MouseButton(LeftButton))
+import Workflow.OSX (runWorkflowT,defaultOSXWorkflowConfig)
+import Workflow.Core (press,delay,getClipboard,setClipboard,openApplication,openURL,MouseButton(LeftButton))
+import Workflow.Derived (insert,click,google)
 
 import qualified Control.Monad.Catch ()
   -- instances only (in particular, @instance MonadThrow IO@)
@@ -13,6 +14,8 @@ import Control.Arrow ((>>>))
 import Data.List (intercalate)
 import Data.Char (toUpper)
 import Control.Monad.IO.Class (liftIO)
+import Control.Exception (throwIO,AsyncException(..))
+
 
 --------------------------------------------------------------------------------
 
@@ -36,7 +39,7 @@ copy = do
   pause
   getClipboard
  --TODO command key is stuck, why? oh, after the pressing, the key doesn't go back up
- -- Disabling sticky keys doesn't help
+ -- Disabling sticky keys doesn't help. Only with press by Unichar, And only After a keyboard shortcut. Keypresses and uni char insertions both seem to work In isolation.
 
 cut = do
   press "H-x"
@@ -101,7 +104,7 @@ but its values will have already all been evaluated before the
 speech recognition engine has started listening.
 
 -}
-commands = fmap (fmap runWorkflowT)
+commands = fmap (fmap (runWorkflowT defaultOSXWorkflowConfig))
   -- runWorkflowT :: WorkflowT IO :~> IO
 
   -- ("H" is Control elsewhere)
@@ -120,9 +123,12 @@ commands = fmap (fmap runWorkflowT)
   , "close tab"     -: press "H-w"                     -- "H" i.e. Hyper is Command on OSX
   , "my email"      -: insert "samboosalis@gmail.com"  -- an Abbreviation
 
+  , "interrupt listening" -: do
+      liftIO $ throwIO UserInterrupt                   -- single UserInterrupt, via Haskell. works!
+
   , "quit listening"-: do
     openApplication "Terminal"
-    press "C-c C-c"                                    -- double UserInterrupt
+    press "C-c C-c"                                    -- double UserInterrupt, via GUI
 
   , "camel that"-: do                                  -- camel case the currently selected text
     x <- cut
@@ -133,14 +139,14 @@ commands = fmap (fmap runWorkflowT)
   , "google that"-: do                                 -- Google the currently selected text
     s <- copy
     pause
-    openURL $ "http://www.google.com/" ++ s  --TODO url-encode
+    google s
 
   , "google word"-: do                                 -- Google the word under the cursor
     doubleClick
     pause
     s <- copy
     pause
-    openURL $ "http://www.google.com/" ++ s   --TODO url-encode
+    google s
 
   -- , "Invalid"       -: press "S-abc"                -- Syntax errors are thrown under 'runWorkflowT'
 
@@ -155,3 +161,4 @@ commands = fmap (fmap runWorkflowT)
   , "" -: nothing
   , "" -: nothing
   ]
+
