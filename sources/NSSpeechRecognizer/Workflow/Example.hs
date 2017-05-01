@@ -101,7 +101,8 @@ With Lazy Maps, the first time a @key@ is recognized, its @value@ @Workflow@ is
 into @IO@. With GHC's laziness, the actions are thereafter cached implicitly.
 A(n 'evaluate'd) Strict Map would take a little longer to construct,
 but its values will have already all been evaluated before the
-speech recognition engine has started listening.
+speech recognition engine has started listening. 
+Actually, it's probably instantaneous either way.
 
 -}
 commands = fmap (fmap (runWorkflowT defaultOSXWorkflowConfig))
@@ -121,7 +122,7 @@ commands = fmap (fmap (runWorkflowT defaultOSXWorkflowConfig))
   [ "scroll     "   -: press "<spc>"                   -- Extra whitespace okay
   , "scroll up"     -: press "S-<spc>"
   , "close tab"     -: press "H-w"                     -- "H" i.e. Hyper is Command on OSX
-  , "my email"      -: insert "samboosalis@gmail.com"  -- an Abbreviation
+  , "my email"      -: insert "<you>@gmail.com"  -- an Abbreviation
 
   , "interrupt listening" -: do
       liftIO $ throwIO UserInterrupt                   -- single UserInterrupt, via Haskell. works!
